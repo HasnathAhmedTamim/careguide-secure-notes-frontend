@@ -13,7 +13,7 @@ export function DashboardPage() {
       <div>
         <h1 className="font-serif text-3xl font-semibold tracking-tight">Dashboard</h1>
         <p className="mt-1 text-muted-foreground">
-          Signed in as {user?.name}. Manage notes and account access from here.
+          Hi {user?.name}. Jump into your private notes or browse community posts.
         </p>
       </div>
 
@@ -56,13 +56,13 @@ export function DashboardPage() {
             <Button asChild variant="outline">
               <Link to="/aggregations/interests">
                 <Tags />
-                Interests
+                Browse interests
               </Link>
             </Button>
             <Button asChild variant="outline">
               <Link to="/aggregations/user-posts">
                 <GitMerge />
-                Lookup posts
+                Member posts
               </Link>
             </Button>
             {user?.role === 'admin' && (

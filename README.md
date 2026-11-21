@@ -1,6 +1,6 @@
-# CareGuide Secure Notes — Frontend
+# CareGuide Notes — Frontend
 
-Functional React + TypeScript UI for the CareGuide secure notes API.
+React + TypeScript app for private notes, community posts, and member discovery.
 
 ## Setup
 
@@ -12,16 +12,19 @@ npm run dev
 
 Default API: `http://localhost:5000/api` via `VITE_API_URL`.
 
-## Pages
+## Features
 
 - Login / Register
-- User dashboard
-- Notes list / create / edit
-- Public posts
-- Aggregations: users by interests
-- Aggregations: user posts (`$lookup`)
-- Admin dashboard
-- Admin user management
-- Admin all notes
+- Private notes (create, edit, delete)
+- Community posts
+- Browse people by interest
+- View a member’s public posts
+- Admin user management and all-notes view
 
 Frontend route guards are UX-only. Authorization is enforced by the backend.
+
+## Seed logins (after backend `npm run seed`)
+
+- Admin: `admin@careguide.test` / `admin123`
+- Member: `nabila@careguide.test` / `user1234`
+- Member: `rafi@careguide.test` / `user1234`

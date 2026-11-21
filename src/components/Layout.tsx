@@ -76,15 +76,15 @@ export function Layout() {
 
             <Separator className="my-2" />
             <p className="px-3 pb-1 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-              Aggregations
+              Discover
             </p>
             <NavLink to="/aggregations/interests" className={linkClass}>
               <Tags className="size-4" />
-              By interests
+              Interests
             </NavLink>
             <NavLink to="/aggregations/user-posts" className={linkClass}>
               <GitMerge className="size-4" />
-              User posts
+              Member posts
             </NavLink>
 
             {user.role === 'admin' && (

@@ -11,7 +11,7 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 export function LoginPage() {
   const { login, user } = useAuth();
   const navigate = useNavigate();
-  const [email, setEmail] = useState('alice@careguide.test');
+  const [email, setEmail] = useState('nabila@careguide.test');
   const [password, setPassword] = useState('user1234');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
@@ -36,7 +36,7 @@ export function LoginPage() {
     <Card>
       <CardHeader>
         <CardTitle>Welcome back</CardTitle>
-        <CardDescription>Sign in to manage your secure notes.</CardDescription>
+        <CardDescription>Sign in to CareGuide Notes to manage private notes and community posts.</CardDescription>
       </CardHeader>
       <CardContent>
         <form onSubmit={onSubmit} className="space-y-4">

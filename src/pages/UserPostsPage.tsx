@@ -1,5 +1,5 @@
 import { useState, type FormEvent } from 'react';
-import { Loader2, Search, GitMerge } from 'lucide-react';
+import { Loader2, Search, Newspaper } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { api } from '@/services/api';
 import type { UserPostsLookup } from '@/types';
@@ -35,25 +35,26 @@ export function UserPostsPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="font-serif text-3xl font-semibold tracking-tight">User posts lookup</h1>
+        <h1 className="font-serif text-3xl font-semibold tracking-tight">Member posts</h1>
         <p className="mt-1 text-muted-foreground">
-          Scenario 2 — one aggregation pipeline with{' '}
-          <code className="rounded bg-muted px-1 py-0.5 text-xs">$lookup</code> from users to posts.
+          Look up a member and read all of their public posts in one place.
         </p>
       </div>
 
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <GitMerge className="size-5" />
-            Run `$lookup`
+            <Newspaper className="size-5" />
+            Find posts by member
           </CardTitle>
-          <CardDescription>Defaults to your own user id. Paste another user id to compare.</CardDescription>
+          <CardDescription>
+            Starts with your own profile. Paste another member ID from Users to explore theirs.
+          </CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={onSubmit} className="flex flex-col gap-3 sm:flex-row sm:items-end">
             <div className="flex-1 space-y-2">
-              <Label htmlFor="userId">User ID</Label>
+              <Label htmlFor="userId">Member ID</Label>
               <Input
                 id="userId"
                 value={userId}
@@ -63,7 +64,7 @@ export function UserPostsPage() {
             </div>
             <Button type="submit" disabled={loading}>
               {loading ? <Loader2 className="animate-spin" /> : <Search />}
-              Fetch posts
+              Show posts
             </Button>
           </form>
         </CardContent>
@@ -96,12 +97,12 @@ export function UserPostsPage() {
                   <CardTitle className="text-base">{p.title}</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <p className="whitespace-pre-wrap text-sm">{p.content}</p>
+                  <p className="whitespace-pre-wrap text-sm leading-relaxed">{p.content}</p>
                 </CardContent>
               </Card>
             ))}
             {result.posts.length === 0 && (
-              <p className="text-sm text-muted-foreground">This user has no posts.</p>
+              <p className="text-sm text-muted-foreground">This member has not published any posts yet.</p>
             )}
           </div>
         </div>

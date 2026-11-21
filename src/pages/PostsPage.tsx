@@ -59,9 +59,9 @@ export function PostsPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="font-serif text-3xl font-semibold tracking-tight">Public posts</h1>
+        <h1 className="font-serif text-3xl font-semibold tracking-tight">Community posts</h1>
         <p className="mt-1 text-muted-foreground">
-          Posts are visible to authenticated users and power the `$lookup` aggregation demo.
+          Share updates with other members. Keep private medical details in your notes instead.
         </p>
       </div>
 
@@ -71,7 +71,7 @@ export function PostsPage() {
             <Send className="size-5" />
             Publish post
           </CardTitle>
-          <CardDescription>Unlike notes, posts are not private.</CardDescription>
+          <CardDescription>Posts are visible to all signed-in members.</CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={onSubmit} className="space-y-4">

@@ -29,10 +29,9 @@ export function InterestsPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="font-serif text-3xl font-semibold tracking-tight">Users by interests</h1>
+        <h1 className="font-serif text-3xl font-semibold tracking-tight">People by interest</h1>
         <p className="mt-1 text-muted-foreground">
-          Scenario 1 — single <code className="rounded bg-muted px-1 py-0.5 text-xs">collection.aggregate()</code>{' '}
-          pipeline (`$unwind` + `$group`).
+          Browse members grouped by shared interests like reading, chess, or wellness.
         </p>
       </div>
 
@@ -45,7 +44,7 @@ export function InterestsPage() {
       {loading ? (
         <div className="flex items-center gap-2 text-muted-foreground">
           <Loader2 className="size-4 animate-spin" />
-          Running aggregation...
+          Loading interests...
         </div>
       ) : (
         <div className="grid gap-3 sm:grid-cols-2">
@@ -57,7 +56,7 @@ export function InterestsPage() {
                   {g._id}
                 </CardTitle>
                 <CardDescription>
-                  {g.users.length === 1 ? '1 user' : `${g.users.length} users`}
+                  {g.users.length === 1 ? '1 member' : `${g.users.length} members`}
                 </CardDescription>
               </CardHeader>
               <CardContent className="flex flex-wrap gap-2">
@@ -70,7 +69,7 @@ export function InterestsPage() {
             </Card>
           ))}
           {groups.length === 0 && (
-            <p className="text-sm text-muted-foreground">No interest groups found.</p>
+            <p className="text-sm text-muted-foreground">No interests to show yet.</p>
           )}
         </div>
       )}

@@ -53,7 +53,7 @@ export function NotesListPage() {
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
           <h1 className="font-serif text-3xl font-semibold tracking-tight">My notes</h1>
-          <p className="mt-1 text-muted-foreground">Private notes only you (or admins) can see.</p>
+          <p className="mt-1 text-muted-foreground">Your private notes — visible only to you and admins.</p>
         </div>
         <Button asChild>
           <Link to="/notes/new">
