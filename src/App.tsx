@@ -1,14 +1,14 @@
 import { Navigate, Route, Routes } from 'react-router-dom';
-import { Layout } from './components/Layout';
-import { ProtectedRoute } from './components/ProtectedRoute';
-import { AdminDashboardPage } from './pages/AdminDashboardPage';
-import { AdminNotesPage } from './pages/AdminNotesPage';
-import { AdminUsersPage } from './pages/AdminUsersPage';
-import { DashboardPage } from './pages/DashboardPage';
-import { LoginPage } from './pages/LoginPage';
-import { NoteFormPage } from './pages/NoteFormPage';
-import { NotesListPage } from './pages/NotesListPage';
-import { RegisterPage } from './pages/RegisterPage';
+import { Layout } from '@/components/Layout';
+import { ProtectedRoute } from '@/components/ProtectedRoute';
+import { AdminDashboardPage } from '@/pages/AdminDashboardPage';
+import { AdminNotesPage } from '@/pages/AdminNotesPage';
+import { AdminUsersPage } from '@/pages/AdminUsersPage';
+import { DashboardPage } from '@/pages/DashboardPage';
+import { LoginPage } from '@/pages/LoginPage';
+import { NoteFormPage } from '@/pages/NoteFormPage';
+import { NotesListPage } from '@/pages/NotesListPage';
+import { RegisterPage } from '@/pages/RegisterPage';
 
 export default function App() {
   return (
