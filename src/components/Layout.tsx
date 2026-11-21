@@ -10,7 +10,7 @@ import {
   NotebookTabs,
   Megaphone,
   Tags,
-  GitMerge,
+  UserRound,
 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
@@ -28,6 +28,7 @@ const linkClass = ({ isActive }: { isActive: boolean }) =>
 
 export function Layout() {
   const { user, logout } = useAuth();
+  const isAdmin = user?.role === 'admin';
 
   if (!user) {
     return (
@@ -57,56 +58,59 @@ export function Layout() {
           </Link>
 
           <nav className="flex flex-col gap-1">
-            <NavLink to="/dashboard" className={linkClass}>
-              <LayoutDashboard className="size-4" />
-              Dashboard
-            </NavLink>
-            <NavLink to="/notes" className={linkClass} end>
-              <StickyNote className="size-4" />
-              My notes
-            </NavLink>
-            <NavLink to="/notes/new" className={linkClass}>
-              <PlusCircle className="size-4" />
-              New note
-            </NavLink>
-            <NavLink to="/posts" className={linkClass}>
-              <Megaphone className="size-4" />
-              Posts
-            </NavLink>
-
-            <Separator className="my-2" />
-            <p className="px-3 pb-1 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-              Discover
-            </p>
-            <NavLink to="/aggregations/interests" className={linkClass}>
-              <Tags className="size-4" />
-              Interests
-            </NavLink>
-            <NavLink to="/aggregations/user-posts" className={linkClass}>
-              <GitMerge className="size-4" />
-              Member posts
-            </NavLink>
-
-            {user.role === 'admin' && (
+            {isAdmin ? (
               <>
-                <Separator className="my-2" />
-                <p className="px-3 pb-1 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-                  Admin
-                </p>
                 <NavLink to="/admin" className={linkClass} end>
                   <Shield className="size-4" />
-                  Overview
+                  Dashboard
                 </NavLink>
-                <NavLink to="/admin/users" className={linkClass}>
-                  <Users className="size-4" />
-                  Users
+                <NavLink to="/notes" className={linkClass} end>
+                  <StickyNote className="size-4" />
+                  My Notes
                 </NavLink>
                 <NavLink to="/admin/notes" className={linkClass}>
                   <NotebookPen className="size-4" />
-                  All notes
+                  All Notes
+                </NavLink>
+                <NavLink to="/admin/users" className={linkClass} end>
+                  <Users className="size-4" />
+                  Manage Users
+                </NavLink>
+                <NavLink to="/admin/interests" className={linkClass}>
+                  <Tags className="size-4" />
+                  Users by Interests
+                </NavLink>
+                <NavLink to="/profile" className={linkClass}>
+                  <UserRound className="size-4" />
+                  My Profile
+                </NavLink>
+              </>
+            ) : (
+              <>
+                <NavLink to="/dashboard" className={linkClass}>
+                  <LayoutDashboard className="size-4" />
+                  Dashboard
+                </NavLink>
+                <NavLink to="/notes" className={linkClass} end>
+                  <StickyNote className="size-4" />
+                  My Notes
+                </NavLink>
+                <NavLink to="/notes/new" className={linkClass}>
+                  <PlusCircle className="size-4" />
+                  Create Note
+                </NavLink>
+                <NavLink to="/profile" className={linkClass}>
+                  <UserRound className="size-4" />
+                  My Profile
                 </NavLink>
               </>
             )}
+
+            <Separator className="my-2" />
+            <NavLink to="/posts" className={linkClass}>
+              <Megaphone className="size-4" />
+              Public Posts
+            </NavLink>
           </nav>
 
           <div className="mt-auto space-y-3 rounded-lg border border-border bg-background p-3">

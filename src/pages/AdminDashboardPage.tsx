@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { Users, NotebookPen, Shield } from 'lucide-react';
+import { Users, NotebookPen, Tags, StickyNote } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 
@@ -7,8 +7,10 @@ export function AdminDashboardPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="font-serif text-3xl font-semibold tracking-tight">Admin overview</h1>
-        <p className="mt-1 text-muted-foreground">Manage users and inspect every note in the system.</p>
+        <h1 className="font-serif text-3xl font-semibold tracking-tight">Admin dashboard</h1>
+        <p className="mt-1 text-muted-foreground">
+          Manage users, review all notes, and explore members by interest.
+        </p>
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2">
@@ -16,13 +18,13 @@ export function AdminDashboardPage() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-lg">
               <Users className="size-5" />
-              Users
+              Manage Users
             </CardTitle>
-            <CardDescription>Create, update, and remove accounts.</CardDescription>
+            <CardDescription>Create, edit, and review member accounts.</CardDescription>
           </CardHeader>
           <CardContent>
             <Button asChild>
-              <Link to="/admin/users">Open user management</Link>
+              <Link to="/admin/users">Open users</Link>
             </Button>
           </CardContent>
         </Card>
@@ -31,9 +33,9 @@ export function AdminDashboardPage() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-lg">
               <NotebookPen className="size-5" />
-              All notes
+              All Notes
             </CardTitle>
-            <CardDescription>Review notes across every user.</CardDescription>
+            <CardDescription>View notes across every account.</CardDescription>
           </CardHeader>
           <CardContent>
             <Button asChild variant="outline">
@@ -41,16 +43,37 @@ export function AdminDashboardPage() {
             </Button>
           </CardContent>
         </Card>
-      </div>
 
-      <Card>
-        <CardContent className="flex items-start gap-3 py-6">
-          <Shield className="mt-0.5 size-5 text-primary" />
-          <p className="text-sm text-muted-foreground">
-            Admin permissions are enforced by the API. Frontend route guards are only for UX.
-          </p>
-        </CardContent>
-      </Card>
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 text-lg">
+              <Tags className="size-5" />
+              Users by Interests
+            </CardTitle>
+            <CardDescription>Grouped members from the aggregation API.</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Button asChild variant="outline">
+              <Link to="/admin/interests">Open interests</Link>
+            </Button>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 text-lg">
+              <StickyNote className="size-5" />
+              My Notes
+            </CardTitle>
+            <CardDescription>Your own private notes.</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Button asChild variant="outline">
+              <Link to="/notes">Open my notes</Link>
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
     </div>
   );
 }

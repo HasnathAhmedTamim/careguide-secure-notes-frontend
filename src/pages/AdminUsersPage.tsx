@@ -1,8 +1,11 @@
 import { useEffect, useState, type FormEvent } from 'react';
-import { Loader2, UserPlus, Trash2, ShieldCheck, Copy } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { Loader2, UserPlus, Trash2, Pencil, Eye } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { api } from '@/services/api';
 import type { User } from '@/types';
+import { usePagination } from '@/hooks/usePagination';
+import { Pagination } from '@/components/Pagination';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -13,6 +16,7 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 
 export function AdminUsersPage() {
   const { token } = useAuth();
+  const { meta, applyMeta, changePage, changeLimit, query, reset } = usePagination(10);
   const [users, setUsers] = useState<User[]>([]);
   const [error, setError] = useState('');
   const [message, setMessage] = useState('');
@@ -27,11 +31,15 @@ export function AdminUsersPage() {
 
   async function load() {
     setLoading(true);
+    setError('');
     try {
-      const res = await api<User[]>('/admin/users?page=1&limit=50', { token });
+      const res = await api<User[]>(`/admin/users?${query}`, { token });
       setUsers(res.data);
+      applyMeta(res.pagination);
     } catch (err) {
       setError((err as Error).message);
+      setUsers([]);
+      applyMeta(undefined);
     } finally {
       setLoading(false);
     }
@@ -39,7 +47,7 @@ export function AdminUsersPage() {
 
   useEffect(() => {
     void load();
-  }, [token]);
+  }, [token, query]);
 
   async function onCreate(e: FormEvent) {
     e.preventDefault();
@@ -59,29 +67,17 @@ export function AdminUsersPage() {
       });
       setMessage('User created');
       setForm({ name: '', email: '', password: '', role: 'user', interests: '' });
-      await load();
-    } catch (err) {
-      setError((err as Error).message);
-    }
-  }
-
-  async function toggleRole(user: User) {
-    setError('');
-    try {
-      await api(`/admin/users/${user.id}`, {
-        method: 'PATCH',
-        token,
-        body: { role: user.role === 'admin' ? 'user' : 'admin' },
-      });
-      setMessage('User updated');
-      await load();
+      reset();
+      if (meta.page === 1) await load();
     } catch (err) {
       setError((err as Error).message);
     }
   }
 
   async function remove(user: User) {
+    if (!window.confirm(`Delete ${user.name}? This cannot be undone.`)) return;
     setError('');
+    setMessage('');
     try {
       await api(`/admin/users/${user.id}`, { method: 'DELETE', token });
       setMessage('User deleted');
@@ -94,8 +90,8 @@ export function AdminUsersPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="font-serif text-3xl font-semibold tracking-tight">User management</h1>
-        <p className="mt-1 text-muted-foreground">Create accounts and adjust roles.</p>
+        <h1 className="font-serif text-3xl font-semibold tracking-tight">Manage users</h1>
+        <p className="mt-1 text-muted-foreground">Create accounts, open details, or edit member info.</p>
       </div>
 
       <Card>
@@ -179,48 +175,52 @@ export function AdminUsersPage() {
           <Loader2 className="size-4 animate-spin" />
           Loading users...
         </div>
+      ) : users.length === 0 ? (
+        <p className="text-sm text-muted-foreground">No users found.</p>
       ) : (
-        <div className="grid gap-3">
-          {users.map((u) => (
-            <Card key={u.id}>
-              <CardContent className="flex flex-col gap-3 py-4 sm:flex-row sm:items-center sm:justify-between">
-                <div>
-                  <p className="font-medium">{u.name}</p>
-                  <p className="text-sm text-muted-foreground">{u.email}</p>
-                  <p className="mt-1 font-mono text-xs text-muted-foreground break-all">ID: {u.id}</p>
-                  <div className="mt-2 flex flex-wrap gap-2">
-                    <Badge variant="secondary" className="capitalize">
-                      {u.role}
-                    </Badge>
-                    {(u.interests || []).map((i) => (
-                      <Badge key={i} variant="outline">
-                        {i}
+        <>
+          <div className="grid gap-3">
+            {users.map((u) => (
+              <Card key={u.id}>
+                <CardContent className="flex flex-col gap-3 py-4 sm:flex-row sm:items-center sm:justify-between">
+                  <div>
+                    <p className="font-medium">{u.name}</p>
+                    <p className="text-sm text-muted-foreground">{u.email}</p>
+                    <div className="mt-2 flex flex-wrap gap-2">
+                      <Badge variant="secondary" className="capitalize">
+                        {u.role}
                       </Badge>
-                    ))}
+                      {(u.interests || []).map((i) => (
+                        <Badge key={i} variant="outline">
+                          {i}
+                        </Badge>
+                      ))}
+                    </div>
                   </div>
-                </div>
-                <div className="flex flex-wrap gap-2">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => void navigator.clipboard.writeText(u.id)}
-                  >
-                    <Copy />
-                    Copy ID
-                  </Button>
-                  <Button variant="outline" size="sm" onClick={() => void toggleRole(u)}>
-                    <ShieldCheck />
-                    Make {u.role === 'admin' ? 'user' : 'admin'}
-                  </Button>
-                  <Button variant="destructive" size="sm" onClick={() => void remove(u)}>
-                    <Trash2 />
-                    Delete
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
+                  <div className="flex flex-wrap gap-2">
+                    <Button asChild variant="outline" size="sm">
+                      <Link to={`/admin/users/${u.id}`}>
+                        <Eye />
+                        Details
+                      </Link>
+                    </Button>
+                    <Button asChild variant="outline" size="sm">
+                      <Link to={`/admin/users/${u.id}/edit`}>
+                        <Pencil />
+                        Edit
+                      </Link>
+                    </Button>
+                    <Button variant="destructive" size="sm" onClick={() => void remove(u)}>
+                      <Trash2 />
+                      Delete
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+          <Pagination meta={meta} onPageChange={changePage} onLimitChange={changeLimit} />
+        </>
       )}
     </div>
   );

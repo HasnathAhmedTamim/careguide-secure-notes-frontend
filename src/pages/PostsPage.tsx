@@ -3,6 +3,8 @@ import { Loader2, Megaphone, Send } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { api } from '@/services/api';
 import type { Post } from '@/types';
+import { usePagination } from '@/hooks/usePagination';
+import { Pagination } from '@/components/Pagination';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -13,6 +15,7 @@ import { Badge } from '@/components/ui/badge';
 
 export function PostsPage() {
   const { token } = useAuth();
+  const { meta, applyMeta, changePage, changeLimit, query, reset } = usePagination(10);
   const [posts, setPosts] = useState<Post[]>([]);
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
@@ -25,10 +28,13 @@ export function PostsPage() {
     setLoading(true);
     setError('');
     try {
-      const res = await api<Post[]>('/posts?page=1&limit=50', { token });
+      const res = await api<Post[]>(`/posts?${query}`, { token });
       setPosts(res.data);
+      applyMeta(res.pagination);
     } catch (err) {
       setError((err as Error).message);
+      setPosts([]);
+      applyMeta(undefined);
     } finally {
       setLoading(false);
     }
@@ -36,7 +42,7 @@ export function PostsPage() {
 
   useEffect(() => {
     void load();
-  }, [token]);
+  }, [token, query]);
 
   async function onSubmit(e: FormEvent) {
     e.preventDefault();
@@ -48,7 +54,8 @@ export function PostsPage() {
       setTitle('');
       setContent('');
       setMessage('Post published');
-      await load();
+      reset();
+      if (meta.page === 1) await load();
     } catch (err) {
       setError((err as Error).message);
     } finally {
@@ -61,7 +68,7 @@ export function PostsPage() {
       <div>
         <h1 className="font-serif text-3xl font-semibold tracking-tight">Community posts</h1>
         <p className="mt-1 text-muted-foreground">
-          Share updates with other members. Keep private medical details in your notes instead.
+          Share updates with other members. Keep private details in your notes instead.
         </p>
       </div>
 
@@ -117,32 +124,34 @@ export function PostsPage() {
           <Loader2 className="size-4 animate-spin" />
           Loading posts...
         </div>
+      ) : posts.length === 0 ? (
+        <p className="text-sm text-muted-foreground">No public posts yet.</p>
       ) : (
-        <div className="grid gap-3">
-          {posts.map((p) => {
-            const author =
-              typeof p.userId === 'object' && p.userId
-                ? p.userId.name || p.userId.email || ''
-                : String(p.userId);
-            return (
-              <Card key={p._id}>
-                <CardHeader className="pb-3">
-                  <CardTitle className="text-lg">{p.title}</CardTitle>
-                  <CardDescription className="flex flex-wrap items-center gap-2">
-                    <Badge variant="outline">{author}</Badge>
-                    <span>{new Date(p.createdAt).toLocaleString()}</span>
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <p className="whitespace-pre-wrap text-sm leading-relaxed">{p.content}</p>
-                </CardContent>
-              </Card>
-            );
-          })}
-          {posts.length === 0 && (
-            <p className="text-sm text-muted-foreground">No public posts yet.</p>
-          )}
-        </div>
+        <>
+          <div className="grid gap-3">
+            {posts.map((p) => {
+              const author =
+                typeof p.userId === 'object' && p.userId
+                  ? p.userId.name || p.userId.email || ''
+                  : String(p.userId);
+              return (
+                <Card key={p._id}>
+                  <CardHeader className="pb-3">
+                    <CardTitle className="text-lg">{p.title}</CardTitle>
+                    <CardDescription className="flex flex-wrap items-center gap-2">
+                      <Badge variant="outline">{author}</Badge>
+                      <span>{new Date(p.createdAt).toLocaleString()}</span>
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="whitespace-pre-wrap text-sm leading-relaxed">{p.content}</p>
+                  </CardContent>
+                </Card>
+              );
+            })}
+          </div>
+          <Pagination meta={meta} onPageChange={changePage} onLimitChange={changeLimit} />
+        </>
       )}
     </div>
   );

@@ -30,9 +30,9 @@ export function InterestsPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="font-serif text-3xl font-semibold tracking-tight">People by interest</h1>
+        <h1 className="font-serif text-3xl font-semibold tracking-tight">Users by Interests</h1>
         <p className="mt-1 text-muted-foreground">
-          Browse members grouped by shared interests. Open a member to see their public posts.
+          Members grouped by shared interests. Open a user to view their profile and posts.
         </p>
       </div>
 
@@ -47,6 +47,8 @@ export function InterestsPage() {
           <Loader2 className="size-4 animate-spin" />
           Loading interests...
         </div>
+      ) : groups.length === 0 ? (
+        <p className="text-sm text-muted-foreground">No interest groups found.</p>
       ) : (
         <div className="grid gap-3 sm:grid-cols-2">
           {groups.map((g) => (
@@ -63,17 +65,12 @@ export function InterestsPage() {
               <CardContent className="flex flex-wrap gap-2">
                 {g.users.map((member) => (
                   <Button key={`${g._id}-${member.id}`} asChild variant="secondary" size="sm">
-                    <Link to={`/aggregations/user-posts?memberId=${member.id}`}>
-                      {member.name}
-                    </Link>
+                    <Link to={`/admin/users/${member.id}`}>{member.name}</Link>
                   </Button>
                 ))}
               </CardContent>
             </Card>
           ))}
-          {groups.length === 0 && (
-            <p className="text-sm text-muted-foreground">No interests to show yet.</p>
-          )}
         </div>
       )}
     </div>

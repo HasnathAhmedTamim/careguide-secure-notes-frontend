@@ -1,0 +1,49 @@
+import { Tags } from 'lucide-react';
+import { useAuth } from '@/contexts/AuthContext';
+import { Badge } from '@/components/ui/badge';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+
+export function ProfilePage() {
+  const { user } = useAuth();
+
+  if (!user) return null;
+
+  return (
+    <div className="space-y-6">
+      <div>
+        <h1 className="font-serif text-3xl font-semibold tracking-tight">My profile</h1>
+        <p className="mt-1 text-muted-foreground">Your account details from the authenticated session.</p>
+      </div>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>{user.name}</CardTitle>
+          <CardDescription>{user.email}</CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div>
+            <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Role</p>
+            <Badge variant="secondary" className="mt-1 capitalize">
+              {user.role}
+            </Badge>
+          </div>
+          <div>
+            <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Interests</p>
+            <div className="mt-2 flex flex-wrap gap-2">
+              {(user.interests || []).length === 0 ? (
+                <p className="text-sm text-muted-foreground">No interests listed.</p>
+              ) : (
+                user.interests.map((interest) => (
+                  <Badge key={interest} variant="outline" className="gap-1">
+                    <Tags className="size-3" />
+                    {interest}
+                  </Badge>
+                ))
+              )}
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+    </div>
+  );
+}

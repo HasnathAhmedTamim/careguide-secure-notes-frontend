@@ -1,6 +1,5 @@
-import { useState } from 'react';
-import { Link } from 'react-router-dom';
-import { StickyNote, PlusCircle, Shield, Tags, Megaphone, GitMerge, Copy, Check } from 'lucide-react';
+import { Link, Navigate } from 'react-router-dom';
+import { StickyNote, PlusCircle, Megaphone, UserRound } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -8,13 +7,9 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 
 export function DashboardPage() {
   const { user } = useAuth();
-  const [copied, setCopied] = useState(false);
 
-  async function copyMemberId() {
-    if (!user?.id) return;
-    await navigator.clipboard.writeText(user.id);
-    setCopied(true);
-    window.setTimeout(() => setCopied(false), 1500);
+  if (user?.role === 'admin') {
+    return <Navigate to="/admin" replace />;
   }
 
   return (
@@ -22,13 +17,13 @@ export function DashboardPage() {
       <div>
         <h1 className="font-serif text-3xl font-semibold tracking-tight">Dashboard</h1>
         <p className="mt-1 text-muted-foreground">
-          Hi {user?.name}. Jump into your private notes or browse community posts.
+          Hi {user?.name}. Manage your private notes and browse community posts.
         </p>
       </div>
 
       <Card>
         <CardHeader>
-          <CardTitle>Profile</CardTitle>
+          <CardTitle>Overview</CardTitle>
           <CardDescription>{user?.email}</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -36,62 +31,32 @@ export function DashboardPage() {
             <Badge variant="secondary" className="capitalize">
               {user?.role}
             </Badge>
-            {(user?.interests || []).map((interest) => (
-              <Badge key={interest} variant="outline" className="gap-1">
-                <Tags className="size-3" />
-                {interest}
-              </Badge>
-            ))}
-          </div>
-          <div className="rounded-md border border-border bg-muted/40 px-3 py-2">
-            <p className="text-xs text-muted-foreground">Your member ID</p>
-            <div className="mt-1 flex flex-wrap items-center gap-2">
-              <code className="text-sm break-all">{user?.id}</code>
-              <Button type="button" variant="outline" size="sm" onClick={() => void copyMemberId()}>
-                {copied ? <Check /> : <Copy />}
-                {copied ? 'Copied' : 'Copy'}
-              </Button>
-            </div>
           </div>
           <div className="flex flex-wrap gap-2">
             <Button asChild>
               <Link to="/notes">
                 <StickyNote />
-                My notes
+                My Notes
               </Link>
             </Button>
             <Button asChild variant="outline">
               <Link to="/notes/new">
                 <PlusCircle />
-                Create note
+                Create Note
+              </Link>
+            </Button>
+            <Button asChild variant="outline">
+              <Link to="/profile">
+                <UserRound />
+                My Profile
               </Link>
             </Button>
             <Button asChild variant="outline">
               <Link to="/posts">
                 <Megaphone />
-                Posts
+                Public Posts
               </Link>
             </Button>
-            <Button asChild variant="outline">
-              <Link to="/aggregations/interests">
-                <Tags />
-                Browse interests
-              </Link>
-            </Button>
-            <Button asChild variant="outline">
-              <Link to="/aggregations/user-posts">
-                <GitMerge />
-                Member posts
-              </Link>
-            </Button>
-            {user?.role === 'admin' && (
-              <Button asChild variant="secondary">
-                <Link to="/admin">
-                  <Shield />
-                  Admin
-                </Link>
-              </Button>
-            )}
           </div>
         </CardContent>
       </Card>
