@@ -1,6 +1,6 @@
 import { useState, type FormEvent } from 'react';
 import { Link, Navigate, useNavigate } from 'react-router-dom';
-import { LogIn, Loader2, Shield, UserRound } from 'lucide-react';
+import { LogIn, Loader2, Shield } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/contexts/ToastContext';
 import { Button } from '@/components/ui/button';
@@ -10,24 +10,10 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Separator } from '@/components/ui/separator';
 
-const DEMO_ACCOUNTS = [
-  {
-    key: 'admin',
-    label: 'Admin demo',
-    description: 'Manage users, all notes, interests',
-    email: 'admin@careguide.test',
-    password: 'admin123',
-    icon: Shield,
-  },
-  {
-    key: 'member',
-    label: 'Member demo',
-    description: 'Private notes and community posts',
-    email: 'nabila@careguide.test',
-    password: 'user1234',
-    icon: UserRound,
-  },
-] as const;
+const ADMIN_DEMO = {
+  email: 'admin@careguide.test',
+  password: 'admin123',
+};
 
 export function LoginPage() {
   const { login, user } = useAuth();
@@ -37,14 +23,14 @@ export function LoginPage() {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  const [demoLoading, setDemoLoading] = useState<string | null>(null);
+  const [demoLoading, setDemoLoading] = useState(false);
 
   if (user) return <Navigate to="/dashboard" replace />;
 
-  async function signIn(nextEmail: string, nextPassword: string, demoKey?: string) {
+  async function signIn(nextEmail: string, nextPassword: string, asDemo = false) {
     setError('');
     setLoading(true);
-    if (demoKey) setDemoLoading(demoKey);
+    if (asDemo) setDemoLoading(true);
     try {
       await login(nextEmail, nextPassword);
       toast.success('Welcome back', 'You are signed in successfully.');
@@ -55,7 +41,7 @@ export function LoginPage() {
       toast.error('Login failed', message);
     } finally {
       setLoading(false);
-      setDemoLoading(null);
+      setDemoLoading(false);
     }
   }
 
@@ -64,56 +50,27 @@ export function LoginPage() {
     await signIn(email, password);
   }
 
-  async function onDemoLogin(account: (typeof DEMO_ACCOUNTS)[number]) {
-    setEmail(account.email);
-    setPassword(account.password);
-    await signIn(account.email, account.password, account.key);
-  }
-
-  const busy = loading || demoLoading !== null;
+  const busy = loading || demoLoading;
 
   return (
     <Card>
       <CardHeader>
         <CardTitle>Welcome back</CardTitle>
         <CardDescription>
-          Sign in to CareGuide Notes, or use a demo account for a quick review.
+          Sign in to CareGuide Notes to manage private notes and community posts.
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-5">
-        <div className="space-y-2">
-          <p className="text-sm font-medium">Demo access for recruiters</p>
-          <div className="grid gap-2">
-            {DEMO_ACCOUNTS.map((account) => {
-              const Icon = account.icon;
-              const isThisLoading = demoLoading === account.key;
-              return (
-                <button
-                  key={account.key}
-                  type="button"
-                  disabled={busy}
-                  onClick={() => void onDemoLogin(account)}
-                  className="flex w-full items-start gap-3 rounded-lg border border-border bg-background px-3 py-3 text-left transition-colors hover:bg-secondary disabled:opacity-60"
-                >
-                  <div className="mt-0.5 rounded-md bg-secondary p-2 text-secondary-foreground">
-                    {isThisLoading ? (
-                      <Loader2 className="size-4 animate-spin" />
-                    ) : (
-                      <Icon className="size-4" />
-                    )}
-                  </div>
-                  <div className="min-w-0 flex-1">
-                    <p className="text-sm font-semibold">{account.label}</p>
-                    <p className="text-xs text-muted-foreground">{account.description}</p>
-                    <p className="mt-1 font-mono text-[11px] text-muted-foreground">
-                      {account.email} / {account.password}
-                    </p>
-                  </div>
-                </button>
-              );
-            })}
-          </div>
-        </div>
+        <Button
+          type="button"
+          variant="secondary"
+          className="w-full"
+          disabled={busy}
+          onClick={() => void signIn(ADMIN_DEMO.email, ADMIN_DEMO.password, true)}
+        >
+          {demoLoading ? <Loader2 className="animate-spin" /> : <Shield />}
+          {demoLoading ? 'Signing in...' : 'Admin login'}
+        </Button>
 
         <div className="flex items-center gap-3">
           <Separator className="flex-1" />
