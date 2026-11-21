@@ -4,6 +4,7 @@ import { Loader2, Search, Newspaper } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { api } from '@/services/api';
 import type { User, UserPostsLookup } from '@/types';
+import { Pagination, type PaginationMeta } from '@/components/Pagination';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -17,13 +18,24 @@ export function UserPostsPage() {
   const [searchParams] = useSearchParams();
   const presetId = searchParams.get('memberId') || user?.id || '';
   const [userId, setUserId] = useState(presetId);
+  const [activeUserId, setActiveUserId] = useState(presetId);
   const [members, setMembers] = useState<User[]>([]);
   const [result, setResult] = useState<UserPostsLookup | null>(null);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [page, setPage] = useState(1);
+  const [limit, setLimit] = useState(10);
+  const [pagination, setPagination] = useState<PaginationMeta>({
+    page: 1,
+    limit: 10,
+    total: 0,
+    totalPages: 0,
+  });
 
   useEffect(() => {
     setUserId(presetId);
+    setActiveUserId(presetId);
+    setPage(1);
   }, [presetId]);
 
   useEffect(() => {
@@ -39,34 +51,37 @@ export function UserPostsPage() {
   }, [user?.role, token]);
 
   useEffect(() => {
-    if (!presetId || !token) return;
+    if (!activeUserId || !token) return;
     void (async () => {
       setLoading(true);
       setError('');
       try {
-        const res = await api<UserPostsLookup>(`/users/${presetId}/posts`, { token });
+        const res = await api<UserPostsLookup>(
+          `/users/${activeUserId}/posts?page=${page}&limit=${limit}`,
+          { token }
+        );
         setResult(res.data);
+        setPagination(
+          res.pagination || {
+            page,
+            limit,
+            total: res.data.posts.length,
+            totalPages: 1,
+          }
+        );
       } catch (err) {
         setError((err as Error).message);
+        setResult(null);
       } finally {
         setLoading(false);
       }
     })();
-  }, [presetId, token]);
+  }, [activeUserId, token, page, limit]);
 
   async function onSubmit(e: FormEvent) {
     e.preventDefault();
-    setLoading(true);
-    setError('');
-    setResult(null);
-    try {
-      const res = await api<UserPostsLookup>(`/users/${userId}/posts`, { token });
-      setResult(res.data);
-    } catch (err) {
-      setError((err as Error).message);
-    } finally {
-      setLoading(false);
-    }
+    setPage(1);
+    setActiveUserId(userId);
   }
 
   return (
@@ -162,6 +177,14 @@ export function UserPostsPage() {
               </p>
             )}
           </div>
+          <Pagination
+            meta={pagination}
+            onPageChange={setPage}
+            onLimitChange={(next) => {
+              setLimit(next);
+              setPage(1);
+            }}
+          />
         </div>
       )}
     </div>

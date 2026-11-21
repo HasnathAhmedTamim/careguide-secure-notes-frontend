@@ -31,6 +31,9 @@ export function InterestsPage() {
   return (
     <div className="space-y-6">
       <PageHeader
+        backTo="/admin"
+        backLabel="Back to Admin Dashboard"
+        breadcrumb="Admin / Users by Interests"
         title="Users by Interests"
         description="Members grouped by shared interests. Open a user to view their profile and posts."
       />
@@ -64,7 +67,7 @@ export function InterestsPage() {
               <CardContent className="flex flex-wrap gap-2">
                 {g.users.map((member) => (
                   <Button key={`${g._id}-${member.id}`} asChild variant="secondary" size="sm">
-                    <Link to={`/admin/users/${member.id}`}>{member.name}</Link>
+                    <Link to={`/admin/users?userId=${member.id}`}>{member.name}</Link>
                   </Button>
                 ))}
               </CardContent>

@@ -38,6 +38,9 @@ export function AdminNotesPage() {
   return (
     <div className="space-y-6">
       <PageHeader
+        backTo="/admin"
+        backLabel="Back to Admin Dashboard"
+        breadcrumb="Admin / All Notes"
         title="All notes"
         description="Admin view across every user account."
       />

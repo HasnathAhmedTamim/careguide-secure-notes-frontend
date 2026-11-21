@@ -9,9 +9,13 @@ export function ProfilePage() {
 
   if (!user) return null;
 
+  const homePath = user.role === 'admin' ? '/admin' : '/dashboard';
+
   return (
     <div className="space-y-6">
       <PageHeader
+        backTo={homePath}
+        backLabel={user.role === 'admin' ? 'Back to Admin Dashboard' : 'Back to Dashboard'}
         title="My profile"
         description="Your account details from the authenticated session."
       />

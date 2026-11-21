@@ -1,5 +1,5 @@
 import { useEffect, useState, type FormEvent } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import { Loader2, UserPlus, Trash2, Pencil, Eye } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/contexts/ToastContext';
@@ -8,6 +8,7 @@ import type { User } from '@/types';
 import { usePagination } from '@/hooks/usePagination';
 import { Pagination } from '@/components/Pagination';
 import { PageHeader } from '@/components/PageHeader';
+import { UserDetailsModal } from '@/components/UserDetailsModal';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -19,10 +20,12 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 export function AdminUsersPage() {
   const { token } = useAuth();
   const toast = useToast();
+  const [searchParams, setSearchParams] = useSearchParams();
   const { meta, applyMeta, changePage, changeLimit, query, reset } = usePagination(10);
   const [users, setUsers] = useState<User[]>([]);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(true);
+  const [detailsUserId, setDetailsUserId] = useState<string | null>(null);
   const [form, setForm] = useState({
     name: '',
     email: '',
@@ -50,6 +53,23 @@ export function AdminUsersPage() {
   useEffect(() => {
     void load();
   }, [token, query]);
+
+  useEffect(() => {
+    const userId = searchParams.get('userId');
+    if (userId) {
+      setDetailsUserId(userId);
+    }
+  }, [searchParams]);
+
+  function openDetails(userId: string) {
+    setDetailsUserId(userId);
+    setSearchParams({ userId });
+  }
+
+  function closeDetails() {
+    setDetailsUserId(null);
+    setSearchParams({});
+  }
 
   async function onCreate(e: FormEvent) {
     e.preventDefault();
@@ -94,8 +114,11 @@ export function AdminUsersPage() {
   return (
     <div className="space-y-6">
       <PageHeader
+        backTo="/admin"
+        backLabel="Back to Admin Dashboard"
+        breadcrumb="Admin / Manage Users"
         title="Manage users"
-        description="Create accounts, open details, or edit member info."
+        description="Create accounts, preview details in a modal, or open edit with a clear back path."
       />
 
       <Card>
@@ -197,11 +220,9 @@ export function AdminUsersPage() {
                     </div>
                   </div>
                   <div className="flex flex-wrap gap-2">
-                    <Button asChild variant="outline" size="sm">
-                      <Link to={`/admin/users/${u.id}`}>
-                        <Eye />
-                        Details
-                      </Link>
+                    <Button type="button" variant="outline" size="sm" onClick={() => openDetails(u.id)}>
+                      <Eye />
+                      Details
                     </Button>
                     <Button asChild variant="outline" size="sm">
                       <Link to={`/admin/users/${u.id}/edit`}>
@@ -221,6 +242,12 @@ export function AdminUsersPage() {
           <Pagination meta={meta} onPageChange={changePage} onLimitChange={changeLimit} />
         </>
       )}
+
+      <UserDetailsModal
+        open={Boolean(detailsUserId)}
+        userId={detailsUserId}
+        onClose={closeDetails}
+      />
     </div>
   );
 }

@@ -1,6 +1,6 @@
 import { useEffect, useState, type FormEvent } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
-import { Loader2, Save, X } from 'lucide-react';
+import { Loader2, Save } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/contexts/ToastContext';
 import { api } from '@/services/api';
@@ -21,6 +21,7 @@ export function AdminEditUserPage() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
+  const [userName, setUserName] = useState('');
   const [form, setForm] = useState({
     name: '',
     email: '',
@@ -36,6 +37,7 @@ export function AdminEditUserPage() {
       try {
         const res = await api<{ user: User }>(`/admin/users/${id}`, { token });
         const u = res.data.user;
+        setUserName(u.name);
         setForm({
           name: u.name,
           email: u.email,
@@ -96,8 +98,11 @@ export function AdminEditUserPage() {
   return (
     <div className="space-y-6">
       <PageHeader
+        backTo="/admin/users"
+        backLabel="Back to Manage Users"
+        breadcrumb={`Admin / Manage Users / ${userName || 'User'} / Edit`}
         title="Edit user"
-        description="Update member details using the admin users API."
+        description="Update member details, then return to the users list."
       />
 
       <Card>
@@ -159,10 +164,7 @@ export function AdminEditUserPage() {
                 {saving ? 'Saving...' : 'Save changes'}
               </Button>
               <Button asChild type="button" variant="outline">
-                <Link to="/admin/users">
-                  <X />
-                  Cancel
-                </Link>
+                <Link to="/admin/users">Cancel</Link>
               </Button>
             </div>
           </form>

@@ -1,5 +1,5 @@
 import { useEffect, useState, type FormEvent } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 import { Save, Loader2 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/contexts/ToastContext';
@@ -73,6 +73,9 @@ export function NoteFormPage({ mode }: { mode: 'create' | 'edit' }) {
   return (
     <div className="space-y-6">
       <PageHeader
+        backTo="/notes"
+        backLabel="Back to My Notes"
+        breadcrumb={mode === 'create' ? 'My Notes / Create' : 'My Notes / Edit'}
         title={mode === 'create' ? 'Create note' : 'Edit note'}
         description="Notes are private to your account unless viewed by an admin."
       />
@@ -102,10 +105,15 @@ export function NoteFormPage({ mode }: { mode: 'create' | 'edit' }) {
                 <AlertDescription>{error}</AlertDescription>
               </Alert>
             )}
-            <Button type="submit" disabled={saving}>
-              {saving ? <Loader2 className="animate-spin" /> : <Save />}
-              {saving ? 'Saving...' : 'Save note'}
-            </Button>
+            <div className="flex flex-wrap gap-2">
+              <Button type="submit" disabled={saving}>
+                {saving ? <Loader2 className="animate-spin" /> : <Save />}
+                {saving ? 'Saving...' : 'Save note'}
+              </Button>
+              <Button asChild type="button" variant="outline">
+                <Link to="/notes">Cancel</Link>
+              </Button>
+            </div>
           </form>
         </CardContent>
       </Card>
