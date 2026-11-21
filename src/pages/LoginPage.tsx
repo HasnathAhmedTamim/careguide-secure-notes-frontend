@@ -69,7 +69,7 @@ export function LoginPage() {
           onClick={() => void signIn(ADMIN_DEMO.email, ADMIN_DEMO.password, true)}
         >
           {demoLoading ? <Loader2 className="animate-spin" /> : <Shield />}
-          {demoLoading ? 'Signing in...' : 'Admin login'}
+          {demoLoading ? 'Signing in...' : 'Demo admin login'}
         </Button>
 
         <div className="flex items-center gap-3">
