@@ -17,6 +17,9 @@ Default API: `http://localhost:5000/api` via `VITE_API_URL`.
 - Login / Register
 - User dashboard
 - Notes list / create / edit
+- Public posts
+- Aggregations: users by interests
+- Aggregations: user posts (`$lookup`)
 - Admin dashboard
 - Admin user management
 - Admin all notes

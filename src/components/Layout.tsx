@@ -8,6 +8,9 @@ import {
   NotebookPen,
   LogOut,
   NotebookTabs,
+  Megaphone,
+  Tags,
+  GitMerge,
 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
@@ -65,6 +68,23 @@ export function Layout() {
             <NavLink to="/notes/new" className={linkClass}>
               <PlusCircle className="size-4" />
               New note
+            </NavLink>
+            <NavLink to="/posts" className={linkClass}>
+              <Megaphone className="size-4" />
+              Posts
+            </NavLink>
+
+            <Separator className="my-2" />
+            <p className="px-3 pb-1 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+              Aggregations
+            </p>
+            <NavLink to="/aggregations/interests" className={linkClass}>
+              <Tags className="size-4" />
+              By interests
+            </NavLink>
+            <NavLink to="/aggregations/user-posts" className={linkClass}>
+              <GitMerge className="size-4" />
+              User posts
             </NavLink>
 
             {user.role === 'admin' && (

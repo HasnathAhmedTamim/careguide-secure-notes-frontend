@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { StickyNote, PlusCircle, Shield, Tags } from 'lucide-react';
+import { StickyNote, PlusCircle, Shield, Tags, Megaphone, GitMerge } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -45,6 +45,24 @@ export function DashboardPage() {
               <Link to="/notes/new">
                 <PlusCircle />
                 Create note
+              </Link>
+            </Button>
+            <Button asChild variant="outline">
+              <Link to="/posts">
+                <Megaphone />
+                Posts
+              </Link>
+            </Button>
+            <Button asChild variant="outline">
+              <Link to="/aggregations/interests">
+                <Tags />
+                Interests
+              </Link>
+            </Button>
+            <Button asChild variant="outline">
+              <Link to="/aggregations/user-posts">
+                <GitMerge />
+                Lookup posts
               </Link>
             </Button>
             {user?.role === 'admin' && (

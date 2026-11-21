@@ -8,6 +8,9 @@ import { DashboardPage } from '@/pages/DashboardPage';
 import { LoginPage } from '@/pages/LoginPage';
 import { NoteFormPage } from '@/pages/NoteFormPage';
 import { NotesListPage } from '@/pages/NotesListPage';
+import { PostsPage } from '@/pages/PostsPage';
+import { InterestsPage } from '@/pages/InterestsPage';
+import { UserPostsPage } from '@/pages/UserPostsPage';
 import { RegisterPage } from '@/pages/RegisterPage';
 
 export default function App() {
@@ -47,6 +50,30 @@ export default function App() {
           element={
             <ProtectedRoute>
               <NoteFormPage mode="edit" />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/posts"
+          element={
+            <ProtectedRoute>
+              <PostsPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/aggregations/interests"
+          element={
+            <ProtectedRoute>
+              <InterestsPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/aggregations/user-posts"
+          element={
+            <ProtectedRoute>
+              <UserPostsPage />
             </ProtectedRoute>
           }
         />
