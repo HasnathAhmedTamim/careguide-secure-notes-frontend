@@ -1,11 +1,12 @@
 import { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { Loader2, Tags } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { api } from '@/services/api';
 import type { InterestGroup } from '@/types';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
 
 export function InterestsPage() {
   const { token } = useAuth();
@@ -31,7 +32,7 @@ export function InterestsPage() {
       <div>
         <h1 className="font-serif text-3xl font-semibold tracking-tight">People by interest</h1>
         <p className="mt-1 text-muted-foreground">
-          Browse members grouped by shared interests like reading, chess, or wellness.
+          Browse members grouped by shared interests. Open a member to see their public posts.
         </p>
       </div>
 
@@ -60,10 +61,12 @@ export function InterestsPage() {
                 </CardDescription>
               </CardHeader>
               <CardContent className="flex flex-wrap gap-2">
-                {g.users.map((name) => (
-                  <Badge key={`${g._id}-${name}`} variant="secondary">
-                    {name}
-                  </Badge>
+                {g.users.map((member) => (
+                  <Button key={`${g._id}-${member.id}`} asChild variant="secondary" size="sm">
+                    <Link to={`/aggregations/user-posts?memberId=${member.id}`}>
+                      {member.name}
+                    </Link>
+                  </Button>
                 ))}
               </CardContent>
             </Card>

@@ -1,5 +1,5 @@
 import { useEffect, useState, type FormEvent } from 'react';
-import { Loader2, UserPlus, Trash2, ShieldCheck } from 'lucide-react';
+import { Loader2, UserPlus, Trash2, ShieldCheck, Copy } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { api } from '@/services/api';
 import type { User } from '@/types';
@@ -187,6 +187,7 @@ export function AdminUsersPage() {
                 <div>
                   <p className="font-medium">{u.name}</p>
                   <p className="text-sm text-muted-foreground">{u.email}</p>
+                  <p className="mt-1 font-mono text-xs text-muted-foreground break-all">ID: {u.id}</p>
                   <div className="mt-2 flex flex-wrap gap-2">
                     <Badge variant="secondary" className="capitalize">
                       {u.role}
@@ -199,6 +200,14 @@ export function AdminUsersPage() {
                   </div>
                 </div>
                 <div className="flex flex-wrap gap-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => void navigator.clipboard.writeText(u.id)}
+                  >
+                    <Copy />
+                    Copy ID
+                  </Button>
                   <Button variant="outline" size="sm" onClick={() => void toggleRole(u)}>
                     <ShieldCheck />
                     Make {u.role === 'admin' ? 'user' : 'admin'}

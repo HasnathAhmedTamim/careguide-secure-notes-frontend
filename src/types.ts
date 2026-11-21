@@ -26,7 +26,7 @@ export type Post = {
 
 export type InterestGroup = {
   _id: string;
-  users: string[];
+  users: Array<{ id: string; name: string }>;
 };
 
 export type UserPostsLookup = {
