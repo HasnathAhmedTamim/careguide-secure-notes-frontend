@@ -57,7 +57,7 @@ export function InterestsPage() {
                   {g._id}
                 </CardTitle>
                 <CardDescription>
-                  {g.users.length} user{g.users.length === 1 ? '' : 's'}
+                  {g.users.length === 1 ? '1 user' : `${g.users.length} users`}
                 </CardDescription>
               </CardHeader>
               <CardContent className="flex flex-wrap gap-2">
