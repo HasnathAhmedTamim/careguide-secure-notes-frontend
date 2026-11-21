@@ -2,6 +2,7 @@ import { useState, type FormEvent } from 'react';
 import { Link, Navigate, useNavigate } from 'react-router-dom';
 import { LogIn, Loader2 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
+import { useToast } from '@/contexts/ToastContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -10,6 +11,7 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 
 export function LoginPage() {
   const { login, user } = useAuth();
+  const toast = useToast();
   const navigate = useNavigate();
   const [email, setEmail] = useState('nabila@careguide.test');
   const [password, setPassword] = useState('user1234');
@@ -24,9 +26,12 @@ export function LoginPage() {
     setLoading(true);
     try {
       await login(email, password);
+      toast.success('Welcome back', 'You are signed in successfully.');
       navigate('/dashboard');
     } catch (err) {
-      setError((err as Error).message);
+      const message = (err as Error).message;
+      setError(message);
+      toast.error('Login failed', message);
     } finally {
       setLoading(false);
     }

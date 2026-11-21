@@ -2,10 +2,12 @@ import { useEffect, useState, type FormEvent } from 'react';
 import { Link } from 'react-router-dom';
 import { Loader2, UserPlus, Trash2, Pencil, Eye } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
+import { useToast } from '@/contexts/ToastContext';
 import { api } from '@/services/api';
 import type { User } from '@/types';
 import { usePagination } from '@/hooks/usePagination';
 import { Pagination } from '@/components/Pagination';
+import { PageHeader } from '@/components/PageHeader';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -16,10 +18,10 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 
 export function AdminUsersPage() {
   const { token } = useAuth();
+  const toast = useToast();
   const { meta, applyMeta, changePage, changeLimit, query, reset } = usePagination(10);
   const [users, setUsers] = useState<User[]>([]);
   const [error, setError] = useState('');
-  const [message, setMessage] = useState('');
   const [loading, setLoading] = useState(true);
   const [form, setForm] = useState({
     name: '',
@@ -52,7 +54,6 @@ export function AdminUsersPage() {
   async function onCreate(e: FormEvent) {
     e.preventDefault();
     setError('');
-    setMessage('');
     try {
       await api('/admin/users', {
         method: 'POST',
@@ -65,34 +66,37 @@ export function AdminUsersPage() {
             .filter(Boolean),
         },
       });
-      setMessage('User created');
+      toast.success('User created', `${form.name} was added successfully.`);
       setForm({ name: '', email: '', password: '', role: 'user', interests: '' });
       reset();
       if (meta.page === 1) await load();
     } catch (err) {
-      setError((err as Error).message);
+      const message = (err as Error).message;
+      setError(message);
+      toast.error('Could not create user', message);
     }
   }
 
   async function remove(user: User) {
     if (!window.confirm(`Delete ${user.name}? This cannot be undone.`)) return;
     setError('');
-    setMessage('');
     try {
       await api(`/admin/users/${user.id}`, { method: 'DELETE', token });
-      setMessage('User deleted');
+      toast.success('User deleted', `${user.name} was removed.`);
       await load();
     } catch (err) {
-      setError((err as Error).message);
+      const message = (err as Error).message;
+      setError(message);
+      toast.error('Could not delete user', message);
     }
   }
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="font-serif text-3xl font-semibold tracking-tight">Manage users</h1>
-        <p className="mt-1 text-muted-foreground">Create accounts, open details, or edit member info.</p>
-      </div>
+      <PageHeader
+        title="Manage users"
+        description="Create accounts, open details, or edit member info."
+      />
 
       <Card>
         <CardHeader>
@@ -162,11 +166,6 @@ export function AdminUsersPage() {
       {error && (
         <Alert variant="destructive">
           <AlertDescription>{error}</AlertDescription>
-        </Alert>
-      )}
-      {message && (
-        <Alert variant="success">
-          <AlertDescription>{message}</AlertDescription>
         </Alert>
       )}
 

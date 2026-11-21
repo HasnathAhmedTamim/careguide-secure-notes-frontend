@@ -2,8 +2,10 @@ import { useEffect, useState, type FormEvent } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { Loader2, Save, X } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
+import { useToast } from '@/contexts/ToastContext';
 import { api } from '@/services/api';
 import type { User } from '@/types';
+import { PageHeader } from '@/components/PageHeader';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -15,6 +17,7 @@ export function AdminEditUserPage() {
   const { id } = useParams();
   const navigate = useNavigate();
   const { token } = useAuth();
+  const toast = useToast();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
@@ -70,9 +73,12 @@ export function AdminEditUserPage() {
             .filter(Boolean),
         },
       });
+      toast.success('User updated', 'Changes were saved successfully.');
       navigate('/admin/users');
     } catch (err) {
-      setError((err as Error).message);
+      const message = (err as Error).message;
+      setError(message);
+      toast.error('Update failed', message);
     } finally {
       setSaving(false);
     }
@@ -89,10 +95,10 @@ export function AdminEditUserPage() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="font-serif text-3xl font-semibold tracking-tight">Edit user</h1>
-        <p className="mt-1 text-muted-foreground">Update member details using the admin users API.</p>
-      </div>
+      <PageHeader
+        title="Edit user"
+        description="Update member details using the admin users API."
+      />
 
       <Card>
         <CardHeader>

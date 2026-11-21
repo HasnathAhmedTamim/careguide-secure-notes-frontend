@@ -1,5 +1,6 @@
 import { Tags } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
+import { PageHeader } from '@/components/PageHeader';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 
@@ -10,10 +11,10 @@ export function ProfilePage() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="font-serif text-3xl font-semibold tracking-tight">My profile</h1>
-        <p className="mt-1 text-muted-foreground">Your account details from the authenticated session.</p>
-      </div>
+      <PageHeader
+        title="My profile"
+        description="Your account details from the authenticated session."
+      />
 
       <Card>
         <CardHeader>

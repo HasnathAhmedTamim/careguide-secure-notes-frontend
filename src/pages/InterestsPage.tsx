@@ -4,6 +4,7 @@ import { Loader2, Tags } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { api } from '@/services/api';
 import type { InterestGroup } from '@/types';
+import { PageHeader } from '@/components/PageHeader';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -29,12 +30,10 @@ export function InterestsPage() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="font-serif text-3xl font-semibold tracking-tight">Users by Interests</h1>
-        <p className="mt-1 text-muted-foreground">
-          Members grouped by shared interests. Open a user to view their profile and posts.
-        </p>
-      </div>
+      <PageHeader
+        title="Users by Interests"
+        description="Members grouped by shared interests. Open a user to view their profile and posts."
+      />
 
       {error && (
         <Alert variant="destructive">

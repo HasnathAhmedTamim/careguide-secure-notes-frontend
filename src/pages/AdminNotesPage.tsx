@@ -5,6 +5,7 @@ import { api } from '@/services/api';
 import type { Note } from '@/types';
 import { usePagination } from '@/hooks/usePagination';
 import { Pagination } from '@/components/Pagination';
+import { PageHeader } from '@/components/PageHeader';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
@@ -36,10 +37,10 @@ export function AdminNotesPage() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="font-serif text-3xl font-semibold tracking-tight">All notes</h1>
-        <p className="mt-1 text-muted-foreground">Admin view across every user account.</p>
-      </div>
+      <PageHeader
+        title="All notes"
+        description="Admin view across every user account."
+      />
 
       {error && (
         <Alert variant="destructive">

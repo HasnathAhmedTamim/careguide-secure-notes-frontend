@@ -2,6 +2,7 @@ import { useState, type FormEvent } from 'react';
 import { Link, Navigate, useNavigate } from 'react-router-dom';
 import { UserPlus, Loader2 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
+import { useToast } from '@/contexts/ToastContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -10,6 +11,7 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 
 export function RegisterPage() {
   const { register, user } = useAuth();
+  const toast = useToast();
   const navigate = useNavigate();
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
@@ -34,9 +36,12 @@ export function RegisterPage() {
           .map((s) => s.trim())
           .filter(Boolean),
       });
+      toast.success('Account created', 'Welcome to CareGuide Notes.');
       navigate('/dashboard');
     } catch (err) {
-      setError((err as Error).message);
+      const message = (err as Error).message;
+      setError(message);
+      toast.error('Registration failed', message);
     } finally {
       setLoading(false);
     }

@@ -1,10 +1,12 @@
 import { useEffect, useState, type FormEvent } from 'react';
 import { Loader2, Megaphone, Send } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
+import { useToast } from '@/contexts/ToastContext';
 import { api } from '@/services/api';
 import type { Post } from '@/types';
 import { usePagination } from '@/hooks/usePagination';
 import { Pagination } from '@/components/Pagination';
+import { PageHeader } from '@/components/PageHeader';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -15,12 +17,12 @@ import { Badge } from '@/components/ui/badge';
 
 export function PostsPage() {
   const { token } = useAuth();
+  const toast = useToast();
   const { meta, applyMeta, changePage, changeLimit, query, reset } = usePagination(10);
   const [posts, setPosts] = useState<Post[]>([]);
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
   const [error, setError] = useState('');
-  const [message, setMessage] = useState('');
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
 
@@ -48,16 +50,17 @@ export function PostsPage() {
     e.preventDefault();
     setSaving(true);
     setError('');
-    setMessage('');
     try {
       await api('/posts', { method: 'POST', token, body: { title, content } });
       setTitle('');
       setContent('');
-      setMessage('Post published');
+      toast.success('Post published', 'Your post is now visible to members.');
       reset();
       if (meta.page === 1) await load();
     } catch (err) {
-      setError((err as Error).message);
+      const message = (err as Error).message;
+      setError(message);
+      toast.error('Publish failed', message);
     } finally {
       setSaving(false);
     }
@@ -65,12 +68,10 @@ export function PostsPage() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="font-serif text-3xl font-semibold tracking-tight">Community posts</h1>
-        <p className="mt-1 text-muted-foreground">
-          Share updates with other members. Keep private details in your notes instead.
-        </p>
-      </div>
+      <PageHeader
+        title="Community posts"
+        description="Share updates with other members. Keep private details in your notes instead."
+      />
 
       <Card>
         <CardHeader>
@@ -111,11 +112,6 @@ export function PostsPage() {
       {error && (
         <Alert variant="destructive">
           <AlertDescription>{error}</AlertDescription>
-        </Alert>
-      )}
-      {message && (
-        <Alert variant="success">
-          <AlertDescription>{message}</AlertDescription>
         </Alert>
       )}
 

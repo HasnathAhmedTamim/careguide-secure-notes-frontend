@@ -2,21 +2,23 @@ import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { PlusCircle, Pencil, Trash2, Loader2, StickyNote } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
+import { useToast } from '@/contexts/ToastContext';
 import { api } from '@/services/api';
 import type { Note } from '@/types';
 import { usePagination } from '@/hooks/usePagination';
 import { Pagination } from '@/components/Pagination';
+import { PageHeader } from '@/components/PageHeader';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 
 export function NotesListPage() {
   const { token } = useAuth();
+  const toast = useToast();
   const { meta, applyMeta, changePage, changeLimit, query } = usePagination(10);
   const [notes, setNotes] = useState<Note[]>([]);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(true);
-  const [message, setMessage] = useState('');
   const [deletingId, setDeletingId] = useState<string | null>(null);
 
   async function load() {
@@ -41,15 +43,16 @@ export function NotesListPage() {
 
   async function remove(id: string) {
     if (!window.confirm('Delete this note? This cannot be undone.')) return;
-    setMessage('');
     setError('');
     setDeletingId(id);
     try {
       await api(`/notes/${id}`, { method: 'DELETE', token });
-      setMessage('Note deleted');
+      toast.success('Note deleted', 'The note was removed from your list.');
       await load();
     } catch (err) {
-      setError((err as Error).message);
+      const message = (err as Error).message;
+      setError(message);
+      toast.error('Delete failed', message);
     } finally {
       setDeletingId(null);
     }
@@ -57,27 +60,22 @@ export function NotesListPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-wrap items-end justify-between gap-3">
-        <div>
-          <h1 className="font-serif text-3xl font-semibold tracking-tight">My notes</h1>
-          <p className="mt-1 text-muted-foreground">Your private notes — visible only to you and admins.</p>
-        </div>
-        <Button asChild>
-          <Link to="/notes/new">
-            <PlusCircle />
-            Create note
-          </Link>
-        </Button>
-      </div>
+      <PageHeader
+        title="My notes"
+        description="Your private notes — visible only to you and admins."
+        actions={
+          <Button asChild>
+            <Link to="/notes/new">
+              <PlusCircle />
+              Create note
+            </Link>
+          </Button>
+        }
+      />
 
       {error && (
         <Alert variant="destructive">
           <AlertDescription>{error}</AlertDescription>
-        </Alert>
-      )}
-      {message && (
-        <Alert variant="success">
-          <AlertDescription>{message}</AlertDescription>
         </Alert>
       )}
 

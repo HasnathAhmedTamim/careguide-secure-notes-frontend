@@ -2,8 +2,10 @@ import { useEffect, useState, type FormEvent } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Save, Loader2 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
+import { useToast } from '@/contexts/ToastContext';
 import { api } from '@/services/api';
 import type { Note } from '@/types';
+import { PageHeader } from '@/components/PageHeader';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -14,6 +16,7 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 export function NoteFormPage({ mode }: { mode: 'create' | 'edit' }) {
   const { id } = useParams();
   const { token } = useAuth();
+  const toast = useToast();
   const navigate = useNavigate();
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
@@ -43,12 +46,16 @@ export function NoteFormPage({ mode }: { mode: 'create' | 'edit' }) {
     try {
       if (mode === 'create') {
         await api('/notes', { method: 'POST', token, body: { title, content } });
+        toast.success('Note created', 'Your private note was saved.');
       } else {
         await api(`/notes/${id}`, { method: 'PATCH', token, body: { title, content } });
+        toast.success('Note updated', 'Your changes were saved.');
       }
       navigate('/notes');
     } catch (err) {
-      setError((err as Error).message);
+      const message = (err as Error).message;
+      setError(message);
+      toast.error('Could not save note', message);
     } finally {
       setSaving(false);
     }
@@ -65,14 +72,10 @@ export function NoteFormPage({ mode }: { mode: 'create' | 'edit' }) {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="font-serif text-3xl font-semibold tracking-tight">
-          {mode === 'create' ? 'Create note' : 'Edit note'}
-        </h1>
-        <p className="mt-1 text-muted-foreground">
-          Notes are private to your account unless viewed by an admin.
-        </p>
-      </div>
+      <PageHeader
+        title={mode === 'create' ? 'Create note' : 'Edit note'}
+        description="Notes are private to your account unless viewed by an admin."
+      />
 
       <Card>
         <CardHeader>
