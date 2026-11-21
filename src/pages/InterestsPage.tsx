@@ -1,10 +1,10 @@
 import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
 import { Loader2, Tags } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { api } from '@/services/api';
 import type { InterestGroup } from '@/types';
 import { PageHeader } from '@/components/PageHeader';
+import { UserDetailsModal } from '@/components/UserDetailsModal';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -14,6 +14,7 @@ export function InterestsPage() {
   const [groups, setGroups] = useState<InterestGroup[]>([]);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(true);
+  const [detailsUserId, setDetailsUserId] = useState<string | null>(null);
 
   useEffect(() => {
     void (async () => {
@@ -66,8 +67,14 @@ export function InterestsPage() {
               </CardHeader>
               <CardContent className="flex flex-wrap gap-2">
                 {g.users.map((member) => (
-                  <Button key={`${g._id}-${member.id}`} asChild variant="secondary" size="sm">
-                    <Link to={`/admin/users?userId=${member.id}`}>{member.name}</Link>
+                  <Button
+                    key={`${g._id}-${member.id}`}
+                    type="button"
+                    variant="secondary"
+                    size="sm"
+                    onClick={() => setDetailsUserId(member.id)}
+                  >
+                    {member.name}
                   </Button>
                 ))}
               </CardContent>
@@ -75,6 +82,12 @@ export function InterestsPage() {
           ))}
         </div>
       )}
+
+      <UserDetailsModal
+        open={Boolean(detailsUserId)}
+        userId={detailsUserId}
+        onClose={() => setDetailsUserId(null)}
+      />
     </div>
   );
 }
