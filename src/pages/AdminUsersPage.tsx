@@ -8,6 +8,7 @@ import type { User } from '@/types';
 import { usePagination } from '@/hooks/usePagination';
 import { Pagination } from '@/components/Pagination';
 import { PageHeader } from '@/components/PageHeader';
+import { ConfirmDialog } from '@/components/ConfirmDialog';
 import { UserDetailsModal } from '@/components/UserDetailsModal';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -26,6 +27,8 @@ export function AdminUsersPage() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(true);
   const [detailsUserId, setDetailsUserId] = useState<string | null>(null);
+  const [pendingDelete, setPendingDelete] = useState<User | null>(null);
+  const [deleting, setDeleting] = useState(false);
   const [form, setForm] = useState({
     name: '',
     email: '',
@@ -97,17 +100,21 @@ export function AdminUsersPage() {
     }
   }
 
-  async function remove(user: User) {
-    if (!window.confirm(`Delete ${user.name}? This cannot be undone.`)) return;
+  async function confirmDelete() {
+    if (!pendingDelete) return;
     setError('');
+    setDeleting(true);
     try {
-      await api(`/admin/users/${user.id}`, { method: 'DELETE', token });
-      toast.success('User deleted', `${user.name} was removed.`);
+      await api(`/admin/users/${pendingDelete.id}`, { method: 'DELETE', token });
+      toast.success('User deleted', `${pendingDelete.name} was removed.`);
+      setPendingDelete(null);
       await load();
     } catch (err) {
       const message = (err as Error).message;
       setError(message);
       toast.error('Could not delete user', message);
+    } finally {
+      setDeleting(false);
     }
   }
 
@@ -230,7 +237,7 @@ export function AdminUsersPage() {
                         Edit
                       </Link>
                     </Button>
-                    <Button variant="destructive" size="sm" onClick={() => void remove(u)}>
+                    <Button variant="destructive" size="sm" onClick={() => setPendingDelete(u)}>
                       <Trash2 />
                       Delete
                     </Button>
@@ -247,6 +254,22 @@ export function AdminUsersPage() {
         open={Boolean(detailsUserId)}
         userId={detailsUserId}
         onClose={closeDetails}
+      />
+
+      <ConfirmDialog
+        open={Boolean(pendingDelete)}
+        title="Delete user?"
+        description={
+          pendingDelete
+            ? `Delete ${pendingDelete.name} (${pendingDelete.email})? This cannot be undone.`
+            : 'This cannot be undone.'
+        }
+        confirmLabel="Delete user"
+        loading={deleting}
+        onClose={() => {
+          if (!deleting) setPendingDelete(null);
+        }}
+        onConfirm={() => void confirmDelete()}
       />
     </div>
   );

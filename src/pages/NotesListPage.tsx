@@ -8,6 +8,7 @@ import type { Note } from '@/types';
 import { usePagination } from '@/hooks/usePagination';
 import { Pagination } from '@/components/Pagination';
 import { PageHeader } from '@/components/PageHeader';
+import { ConfirmDialog } from '@/components/ConfirmDialog';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
@@ -19,7 +20,8 @@ export function NotesListPage() {
   const [notes, setNotes] = useState<Note[]>([]);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(true);
-  const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [pendingDelete, setPendingDelete] = useState<Note | null>(null);
+  const [deleting, setDeleting] = useState(false);
 
   async function load() {
     setLoading(true);
@@ -41,20 +43,21 @@ export function NotesListPage() {
     void load();
   }, [token, query]);
 
-  async function remove(id: string) {
-    if (!window.confirm('Delete this note? This cannot be undone.')) return;
+  async function confirmDelete() {
+    if (!pendingDelete) return;
     setError('');
-    setDeletingId(id);
+    setDeleting(true);
     try {
-      await api(`/notes/${id}`, { method: 'DELETE', token });
+      await api(`/notes/${pendingDelete._id}`, { method: 'DELETE', token });
       toast.success('Note deleted', 'The note was removed from your list.');
+      setPendingDelete(null);
       await load();
     } catch (err) {
       const message = (err as Error).message;
       setError(message);
       toast.error('Delete failed', message);
     } finally {
-      setDeletingId(null);
+      setDeleting(false);
     }
   }
 
@@ -117,10 +120,9 @@ export function NotesListPage() {
                     <Button
                       variant="destructive"
                       size="sm"
-                      disabled={deletingId === n._id}
-                      onClick={() => void remove(n._id)}
+                      onClick={() => setPendingDelete(n)}
                     >
-                      {deletingId === n._id ? <Loader2 className="animate-spin" /> : <Trash2 />}
+                      <Trash2 />
                       Delete
                     </Button>
                   </div>
@@ -135,6 +137,22 @@ export function NotesListPage() {
           />
         </>
       )}
+
+      <ConfirmDialog
+        open={Boolean(pendingDelete)}
+        title="Delete note?"
+        description={
+          pendingDelete
+            ? `Delete “${pendingDelete.title}”? This cannot be undone.`
+            : 'This cannot be undone.'
+        }
+        confirmLabel="Delete note"
+        loading={deleting}
+        onClose={() => {
+          if (!deleting) setPendingDelete(null);
+        }}
+        onConfirm={() => void confirmDelete()}
+      />
     </div>
   );
 }
